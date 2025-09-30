@@ -2,7 +2,7 @@ using System;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class NewPlayer : MonoBehaviour
 {
     private Vector2 NewstartTouch;
     private float NewlastTapTime = 0f;
