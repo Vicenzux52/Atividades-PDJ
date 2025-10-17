@@ -1,14 +1,23 @@
 using System;
+using NUnit.Framework;
 using UnityEditor.Rendering;
 using UnityEngine;
 
 public class NewPlayer : MonoBehaviour
 {
-    private Vector2 NewstartTouch;
-    private float NewlastTapTime = 0f;
-    private int NewtapCount = 0;
+    private Vector2 startTouch;
+    public int route = 0;
+    [SerializeField] float routeDistance = 2f;
+    public int routeQuantity = 5;   //only odd
+    public float FrontalSpeed = 10;
+    public float lateralSpeed = 10;
+    public float delayTime = 3f;
+    public float delayCounter = 3f;
+    bool isDelayed = false;
+
     void Start()
     {
+        routeQuantity = (routeQuantity - 1) / 2;
         if (SystemInfo.supportsGyroscope)
         {
             Input.gyro.enabled = true;
@@ -17,108 +26,63 @@ public class NewPlayer : MonoBehaviour
 
     void Update()
     {
-        NewDetectTaps();
-        NewDetectSwipes();
-        NewDetectPinch();
-        //NewDetectTilt();
-        //NewDetectGyro();
+        GetInputs();
+        FrontalMovement();
+        SideMovement();
+        if (delayCounter < delayTime) delayCounter += Time.deltaTime;
+        else isDelayed = false;
     }
 
-    void NewDetectTaps()
+    void FrontalMovement()
     {
-        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (!isDelayed) transform.Translate(Vector3.forward * FrontalSpeed * Time.deltaTime, Space.World);
+        else transform.Translate(Vector3.forward * FrontalSpeed / 3 * Time.deltaTime, Space.World);
+    }
+
+    void SideMovement()
+    {
+        route = Mathf.Clamp(route, -routeQuantity, routeQuantity);
+        transform.position = Vector3.MoveTowards(transform.position, new Vector3(route * routeDistance,
+        transform.position.y, transform.position.z), lateralSpeed * Time.deltaTime);
+    }
+
+    void GetInputs()
+{
+    bool leftInputs = Input.GetKeyDown(KeyCode.A) && route > -routeQuantity;
+    bool rightInputs = Input.GetKeyDown(KeyCode.D) && route < routeQuantity;
+
+#if UNITY_ANDROID || UNITY_IOS
+    if (Input.touchCount > 0)
+    {
+        Touch touch = Input.GetTouch(0);
+
+        if (touch.phase == TouchPhase.Began)
         {
-            float timeNow = Time.time;
-
-            if (timeNow - NewlastTapTime < 0.3f)
-                NewtapCount++;
-            else
-                NewtapCount = 1;
-
-            NewlastTapTime = timeNow;
-
-            if (NewtapCount == 1) Debug.Log("Single Tap");
-            if (NewtapCount == 2) Debug.Log("Double Tap");
-            if (NewtapCount == 3) Debug.Log("Triple Tap");
+            startTouch = touch.position;
         }
-    }
-
-    void NewDetectSwipes()
-    {
-        if (Input.touchCount == 1)
+        else if (touch.phase == TouchPhase.Ended)
         {
-            Touch t = Input.GetTouch(0);
+            Vector2 swipeDelta = touch.position - startTouch;
 
-            if (t.phase == TouchPhase.Began)
-                NewstartTouch = t.position;
-
-            else if (t.phase == TouchPhase.Ended)
+            // se o movimento horizontal for predominante
+            if (Mathf.Abs(swipeDelta.x) > Mathf.Abs(swipeDelta.y) && Mathf.Abs(swipeDelta.x) > 50f)
             {
-                Vector2 delta = t.position - NewstartTouch;
-
-                if (delta.magnitude > 100)
-                {
-                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
-                    {
-                        if (delta.x > 0) Debug.Log("Swipe Right");
-                        else Debug.Log("Swipe Left");
-                    }
-                    else
-                    {
-                        if (delta.y > 0) Debug.Log("Swipe Up");
-                        else Debug.Log("Swipe Down");
-                    }
-                }
+                if (swipeDelta.x > 0 && route < routeQuantity)
+                    rightInputs = true;
+                else if (swipeDelta.x < 0 && route > -routeQuantity)
+                    leftInputs = true;
             }
         }
     }
-    void NewDetectPinch()
-    {
-        if (Input.touchCount == 2)
-        {
-            Touch t0 = Input.GetTouch(0);
-            Touch t1 = Input.GetTouch(1);
+#endif
 
-            Vector2 start0 = t0.position - t0.deltaPosition;
-            Vector2 start1 = t1.position - t1.deltaPosition;
-
-            float startDist = (start0 - start1).magnitude;
-            float atualDist = (t0.position - t1.position).magnitude;
-
-            if (atualDist > startDist + 10)
-                Debug.Log("Pinch Out (Zoom In)");
-            else if (atualDist < startDist - 10)
-                Debug.Log("Pinch In (Zoom Out)");
-        }
+        if (leftInputs) route--;
+        if (rightInputs) route++;
     }
-
-    void NewDetectTilt()
+    public void Delay()
     {
-        Vector3 tilt = Input.acceleration;
-
-        if (Mathf.Abs(tilt.x) > 0.2f)
-            if (tilt.x > 0) Debug.Log("Tilt Right");
-            else
-            {
-                // Debug.Log("Tilt Left");
-            }
-
-        if (Mathf.Abs(tilt.y) > 0.2f)
-            if (tilt.y > 0) Debug.Log("Tilt Up");
-            else
-            {
-                // Debug.Log("Tilt Down");
-            }
-        Debug.Log(tilt);
+        isDelayed = true;
+        delayCounter = 0;
     }
-
-    void DetectGyro()
-    {
-        if (SystemInfo.supportsGyroscope)
-        {
-            Vector3 rot = Input.gyro.rotationRateUnbiased;
-            if (rot.sqrMagnitude > 0.01f)
-                Debug.Log("Gyro rotation: " + rot);
-        }
-    }
+    
 }
