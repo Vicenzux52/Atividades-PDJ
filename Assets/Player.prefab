@@ -308,9 +308,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11c51f16db15a348970ac1ef32a9b16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  route: 0
   routeDistance: 2
   routeQuantity: 5
   FrontalSpeed: 10
   lateralSpeed: 10
   delayTime: 3
   delayCounter: 3
+  playerMaterial: {fileID: 2100000, guid: 9a7aa5b193ca9314e8bd196fb1d8b9f1, type: 2}

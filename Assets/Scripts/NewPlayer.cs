@@ -14,6 +14,8 @@ public class NewPlayer : MonoBehaviour
     public float delayTime = 3f;
     public float delayCounter = 3f;
     bool isDelayed = false;
+    public Material playerMaterial;
+    Color original;
 
     void Start()
     {
@@ -22,6 +24,7 @@ public class NewPlayer : MonoBehaviour
         {
             Input.gyro.enabled = true;
         }
+        original = playerMaterial.color;
     }
 
     void Update()
@@ -47,9 +50,9 @@ public class NewPlayer : MonoBehaviour
     }
 
     void GetInputs()
-{
-    bool leftInputs = Input.GetKeyDown(KeyCode.A) && route > -routeQuantity;
-    bool rightInputs = Input.GetKeyDown(KeyCode.D) && route < routeQuantity;
+    {
+        bool leftInputs = Input.GetKeyDown(KeyCode.A) && route > -routeQuantity;
+        bool rightInputs = Input.GetKeyDown(KeyCode.D) && route < routeQuantity;
 
 #if UNITY_ANDROID || UNITY_IOS
     if (Input.touchCount > 0)
@@ -83,6 +86,19 @@ public class NewPlayer : MonoBehaviour
     {
         isDelayed = true;
         delayCounter = 0;
+    }
+
+    public void PowerUp()
+    {
+        Invoke("EndPowerUp()", 5);
+        lateralSpeed *= 2;
+        playerMaterial.color = Color.yellow;
+    }
+
+    public void EndPowerUp()
+    {
+        lateralSpeed /= 2;
+        playerMaterial.color = original;
     }
     
 }
