@@ -15,7 +15,8 @@ public class NewPlayer : MonoBehaviour
     public float delayCounter = 3f;
     bool isDelayed = false;
     public Material playerMaterial;
-    Color original;
+    Color original = Color.green;
+    public int coin = 0;
 
     void Start()
     {
@@ -24,7 +25,7 @@ public class NewPlayer : MonoBehaviour
         {
             Input.gyro.enabled = true;
         }
-        original = playerMaterial.color;
+        playerMaterial.color = original;
     }
 
     void Update()
@@ -100,5 +101,22 @@ public class NewPlayer : MonoBehaviour
         lateralSpeed /= 2;
         playerMaterial.color = original;
     }
+
+    public void Debuff()
+    {
+        Invoke("EndDebuff", 3);
+        lateralSpeed *= 0.75f;
+        playerMaterial.color = Color.red;
+    }
+
+    public void EndDebuff()
+    {
+        lateralSpeed /= 0.75f;
+        playerMaterial.color = original;
+    }
     
+    public void GetCoin()
+    {
+        coin++;
+    }
 }

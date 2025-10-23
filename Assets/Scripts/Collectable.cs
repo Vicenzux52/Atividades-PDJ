@@ -3,32 +3,34 @@ using UnityEngine;
 public class Collectable : MonoBehaviour
 {
     int type;
-    GameObject powerUp;
-    GameObject debuff;
-    GameObject light;
-    GameObject coin;
-    GameObject multiplier;
+    public GameObject powerUp;
+    public GameObject debuff;
+    public GameObject light;
+    public GameObject coin;
+    public GameObject multiplier;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        type = Random.Range(0, 4);    //1 - PowerUp; 2 - Debuff; 3 - Ilumina o player; 4 - coin; 5 - Multiplicador
-        switch (type)
+        type = Random.Range(0, 30);    //1 - PowerUp; 2 - Debuff; 3 - Ilumina o player; 4 - coin; 5 - Multiplicador
+        if (type < 5)
         {
-            case 0:
-                Instantiate(powerUp);
-                break;
-            case 1:
-                Instantiate(debuff);
-                break;
-            case 2:
-                Instantiate(light);
-                break;
-            case 3:
-                Instantiate(coin);
-                break;
-            case 4:
-                Instantiate(multiplier);
-                break;
+            Instantiate(powerUp, transform);
+        }
+        else if (type < 9)
+        {
+            Instantiate(debuff, transform);
+        }
+        else if (type < 12)
+        {
+            Instantiate(light, transform);
+        }
+        else if (type < 22)
+        {
+            Instantiate(coin, transform);
+        }
+        else if (type < 25)
+        {
+            Instantiate(debuff, transform);
         }
     }
 
