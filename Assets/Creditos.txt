@@ -1,0 +1,3 @@
+Simple Water Shader URP | Autor: IgniteCoders | Source: https://assetstore.unity.com
+512º skyboxes | Autor: elyvisions | Source: opengameart.com
+Modelo and FPS control | Udan
